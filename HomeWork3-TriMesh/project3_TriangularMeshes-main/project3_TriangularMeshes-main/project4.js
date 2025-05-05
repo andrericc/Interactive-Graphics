@@ -181,3 +181,4 @@ const meshFS = `
       gl_FragColor = vec4(1,gl_FragCoord.z*gl_FragCoord.z,0,1);
     }
   }
+`;
