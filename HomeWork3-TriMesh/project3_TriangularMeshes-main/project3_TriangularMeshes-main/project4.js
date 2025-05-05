@@ -12,8 +12,27 @@ function GetModelViewProjection( projectionMatrix, translationX, translationY, t
 		0, 0, 1, 0,
 		translationX, translationY, translationZ, 1
 	];
+	const cos_x = Math.cos(rotationX);
+	const sin_x = Math.sin(rotationX);
+	const cos_y = Math.cos(rotationY);
+	const sin_y = Math.sin(rotationY);
+	const rot_x = [
+	1, 0, 0, 0,
+	0, cos_x, sin_x, 0,
+	0, -sin_x, cos_x, 0,
+	0, 0, 0, 1
+	];
+	const rot_y = [
+	cos_y, 0, -sin_y, 0,
+	0, 1, 0, 0,
+	sin_y, 0, cos_y, 0,
+	0, 0, 0, 1
+	];
+	trans = MatrixMult(trans, rot_x);
+	trans = MatrixMult(trans, rot_y);
 	var mvp = MatrixMult( projectionMatrix, trans );
 	return mvp;
+	
 }
 
 
