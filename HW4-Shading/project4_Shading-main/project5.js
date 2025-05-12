@@ -182,3 +182,66 @@ class MeshDrawer
 	    gl.uniform1f(this.shininess, shininess);
 	}
 }
+
+const I = [
+	1, 0, 0, 0,
+	0, 1, 0, 0,
+	0, 0, 1, 0,
+	0, 0, 0, 1,
+  ]
+  const meshVS = `
+	attribute vec3 vrt;
+	attribute vec2 txc;
+	attribute vec3 nrm;
+  
+	uniform mat4 mvp;
+	uniform mat4 mv;
+	uniform mat3 mNrm;
+  
+	varying vec3 normal;
+	varying vec3 h_v;
+  
+	varying vec2 texCoord;
+  
+	uniform vec3 lightDir;
+	uniform float shininess;
+  
+	void main() {
+	  gl_Position = mvp * vec4(vrt, 1);
+  
+	  texCoord = txc;
+	  normal = mNrm * nrm;
+  
+	  // half-way vector can be computed in vertex since it does not use the normal !!!
+	  vec4 vertCoord = mv * vec4(vrt, 1);
+	  h_v = normalize(lightDir - vertCoord.xyz);
+	}
+  	`;
+  
+  const meshFS = `
+	precision highp float;
+
+	varying vec3 normal;
+	varying vec3 h_v;
+
+	uniform bool showTex;
+	uniform sampler2D tex;
+	varying vec2 texCoord;
+
+	uniform vec3 lightDir;
+	uniform float shininess;
+
+	void main() {
+	vec3 n = normalize(normal);
+	vec3 l = normalize(lightDir);
+
+	vec3 shade = 0.05 * vec3(0, 1, 0);
+	float geo_term = dot(n, l);
+	if (geo_term > 0.0) {
+		vec3 K_d = showTex ? texture2D(tex, texCoord).xyz : vec3(1.0, 1.0, 1.0);
+		shade += geo_term * K_d + vec3(0.1) * pow(dot(h_v, n), shininess);
+	}
+
+	gl_FragColor = vec4(shade, 1.0);
+	}
+	`;
